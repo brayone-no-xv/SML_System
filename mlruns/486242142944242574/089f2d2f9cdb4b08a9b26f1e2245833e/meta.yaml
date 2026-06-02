@@ -1,0 +1,15 @@
+artifact_uri: file:///home/brayone_xv/Documents/CODE/2-PROJECT/MLOps/SML_System/mlruns/486242142944242574/089f2d2f9cdb4b08a9b26f1e2245833e/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '486242142944242574'
+lifecycle_stage: active
+run_id: 089f2d2f9cdb4b08a9b26f1e2245833e
+run_name: merciful-hound-845
+run_uuid: 089f2d2f9cdb4b08a9b26f1e2245833e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779781459700
+status: 1
+tags: []
+user_id: brayone_xv

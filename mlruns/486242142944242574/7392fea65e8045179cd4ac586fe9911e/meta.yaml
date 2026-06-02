@@ -1,0 +1,15 @@
+artifact_uri: file:///home/brayone_xv/Documents/CODE/2-PROJECT/MLOps/SML_System/mlruns/486242142944242574/7392fea65e8045179cd4ac586fe9911e/artifacts
+end_time: 1779778065490
+entry_point_name: ''
+experiment_id: '486242142944242574'
+lifecycle_stage: active
+run_id: 7392fea65e8045179cd4ac586fe9911e
+run_name: tuning
+run_uuid: 7392fea65e8045179cd4ac586fe9911e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779778058366
+status: 4
+tags: []
+user_id: brayone_xv

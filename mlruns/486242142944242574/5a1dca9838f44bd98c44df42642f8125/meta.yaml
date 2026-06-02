@@ -1,0 +1,15 @@
+artifact_uri: file:///home/brayone_xv/Documents/CODE/2-PROJECT/MLOps/SML_System/mlruns/486242142944242574/5a1dca9838f44bd98c44df42642f8125/artifacts
+end_time: 1780035451229
+entry_point_name: ''
+experiment_id: '486242142944242574'
+lifecycle_stage: active
+run_id: 5a1dca9838f44bd98c44df42642f8125
+run_name: sedate-sponge-574
+run_uuid: 5a1dca9838f44bd98c44df42642f8125
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780035432816
+status: 3
+tags: []
+user_id: brayone_xv

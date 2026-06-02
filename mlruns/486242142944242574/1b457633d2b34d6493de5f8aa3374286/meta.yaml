@@ -1,0 +1,15 @@
+artifact_uri: file:///home/brayone_xv/Documents/CODE/2-PROJECT/MLOps/SML_System/mlruns/486242142944242574/1b457633d2b34d6493de5f8aa3374286/artifacts
+end_time: 1779781957528
+entry_point_name: ''
+experiment_id: '486242142944242574'
+lifecycle_stage: active
+run_id: 1b457633d2b34d6493de5f8aa3374286
+run_name: enthused-trout-640
+run_uuid: 1b457633d2b34d6493de5f8aa3374286
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779781943687
+status: 3
+tags: []
+user_id: brayone_xv

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/brayone_xv/Documents/CODE/2-PROJECT/MLOps/SML_System/mlruns/486242142944242574/7edf52b280c1413b88eaad981590df7f/artifacts
+end_time: 1780035402838
+entry_point_name: ''
+experiment_id: '486242142944242574'
+lifecycle_stage: active
+run_id: 7edf52b280c1413b88eaad981590df7f
+run_name: unleashed-smelt-229
+run_uuid: 7edf52b280c1413b88eaad981590df7f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780035382938
+status: 3
+tags: []
+user_id: brayone_xv

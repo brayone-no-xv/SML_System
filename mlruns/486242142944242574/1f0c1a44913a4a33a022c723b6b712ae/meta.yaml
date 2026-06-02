@@ -1,0 +1,15 @@
+artifact_uri: file:///home/brayone_xv/Documents/CODE/2-PROJECT/MLOps/SML_System/mlruns/486242142944242574/1f0c1a44913a4a33a022c723b6b712ae/artifacts
+end_time: 1779781804338
+entry_point_name: ''
+experiment_id: '486242142944242574'
+lifecycle_stage: active
+run_id: 1f0c1a44913a4a33a022c723b6b712ae
+run_name: abrasive-wren-878
+run_uuid: 1f0c1a44913a4a33a022c723b6b712ae
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779781790554
+status: 3
+tags: []
+user_id: brayone_xv

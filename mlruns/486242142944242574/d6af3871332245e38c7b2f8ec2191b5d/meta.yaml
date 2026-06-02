@@ -1,0 +1,15 @@
+artifact_uri: file:///home/brayone_xv/Documents/CODE/2-PROJECT/MLOps/SML_System/mlruns/486242142944242574/d6af3871332245e38c7b2f8ec2191b5d/artifacts
+end_time: 1779781943685
+entry_point_name: ''
+experiment_id: '486242142944242574'
+lifecycle_stage: active
+run_id: d6af3871332245e38c7b2f8ec2191b5d
+run_name: fortunate-dog-546
+run_uuid: d6af3871332245e38c7b2f8ec2191b5d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779781930459
+status: 3
+tags: []
+user_id: brayone_xv

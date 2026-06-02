@@ -1,0 +1,15 @@
+artifact_uri: file:///home/brayone_xv/Documents/CODE/2-PROJECT/MLOps/SML_System/mlruns/486242142944242574/8bee04e09d1e48d5ac02e350c7fed248/artifacts
+end_time: 1779778065487
+entry_point_name: ''
+experiment_id: '486242142944242574'
+lifecycle_stage: active
+run_id: 8bee04e09d1e48d5ac02e350c7fed248
+run_name: caring-lark-999
+run_uuid: 8bee04e09d1e48d5ac02e350c7fed248
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779778058378
+status: 4
+tags: []
+user_id: brayone_xv

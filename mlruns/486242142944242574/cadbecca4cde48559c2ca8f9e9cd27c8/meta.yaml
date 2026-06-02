@@ -1,0 +1,15 @@
+artifact_uri: file:///home/brayone_xv/Documents/CODE/2-PROJECT/MLOps/SML_System/mlruns/486242142944242574/cadbecca4cde48559c2ca8f9e9cd27c8/artifacts
+end_time: 1779781760108
+entry_point_name: ''
+experiment_id: '486242142944242574'
+lifecycle_stage: active
+run_id: cadbecca4cde48559c2ca8f9e9cd27c8
+run_name: trusting-colt-469
+run_uuid: cadbecca4cde48559c2ca8f9e9cd27c8
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779781740458
+status: 3
+tags: []
+user_id: brayone_xv

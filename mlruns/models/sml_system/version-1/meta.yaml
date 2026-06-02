@@ -1,0 +1,16 @@
+creation_timestamp: 1780035971193
+current_stage: None
+deployment_job_state: null
+description: ''
+last_updated_timestamp: 1780035971193
+model_id: ''
+name: sml_system
+run_id: feb37af613904b6886705eaf0576879b
+run_link: ''
+source: runs:/feb37af613904b6886705eaf0576879b/best_model
+status: READY
+status_message: null
+storage_location: runs:/feb37af613904b6886705eaf0576879b/best_model
+user_id: null
+version: 1
+workspace: default

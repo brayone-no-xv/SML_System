@@ -1,0 +1,15 @@
+artifact_uri: file:///home/brayone_xv/Documents/CODE/2-PROJECT/MLOps/SML_System/mlruns/486242142944242574/7443a4e2537c4d3cbcf145a311f0dccc/artifacts
+end_time: 1779781323630
+entry_point_name: ''
+experiment_id: '486242142944242574'
+lifecycle_stage: active
+run_id: 7443a4e2537c4d3cbcf145a311f0dccc
+run_name: spiffy-perch-454
+run_uuid: 7443a4e2537c4d3cbcf145a311f0dccc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779781271179
+status: 3
+tags: []
+user_id: brayone_xv

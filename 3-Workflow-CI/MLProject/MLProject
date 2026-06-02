@@ -1,0 +1,9 @@
+name: SML_System
+conda_env: 
+
+entry_points:
+  main:
+    parameters:
+      alpha: {type: float, default: 0.5}
+      l1_ratio: {type: float, default: 0.1}
+    command: "python 2-Membangun_model/modelling_tuning.py {alpha} {l1_ratio}"

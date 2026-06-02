@@ -1,0 +1,15 @@
+artifact_uri: file:///home/brayone_xv/Documents/CODE/2-PROJECT/MLOps/SML_System/mlruns/486242142944242574/0d51e2f5417c4ab69e9d02e01ccca96b/artifacts
+end_time: 1779781994962
+entry_point_name: ''
+experiment_id: '486242142944242574'
+lifecycle_stage: active
+run_id: 0d51e2f5417c4ab69e9d02e01ccca96b
+run_name: fortunate-hawk-450
+run_uuid: 0d51e2f5417c4ab69e9d02e01ccca96b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779781981161
+status: 3
+tags: []
+user_id: brayone_xv

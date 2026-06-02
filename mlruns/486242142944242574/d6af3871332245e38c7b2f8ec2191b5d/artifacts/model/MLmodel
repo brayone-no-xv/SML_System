@@ -1,0 +1,33 @@
+artifact_path: model
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.13.5
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.6.1
+mlflow_version: 2.19.0
+model_size_bytes: 1519253
+model_uuid: 05503cc754034f30bfb032659ee109fe
+run_id: d6af3871332245e38c7b2f8ec2191b5d
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "long", "name": "Tahun", "required": true}, {"type": "long",
+    "name": "Periode", "required": true}, {"type": "string", "name": "Provinsi", "required":
+    true}, {"type": "string", "name": "Pemda", "required": true}, {"type": "string",
+    "name": "Akun", "required": true}, {"type": "double", "name": "Anggaran", "required":
+    true}, {"type": "double", "name": "Realisasi", "required": true}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "float64", "shape": [-1]}}]'
+  params: null
+utc_time_created: '2026-05-26 07:52:16.909727'
