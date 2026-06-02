@@ -9,8 +9,8 @@ on:
       - main
 
 env:
-  CSV_URL: "MLproject/train_pca.csv"
-  TARGET_VAR: "pca-banking"
+  DATA_PATH: "MLProject/namadataset_preprocessing/apbd_data_2026_preprocessed.csv"
+  TARGET_VAR: "Persentase"
 
 jobs:
   build:
@@ -29,7 +29,7 @@ jobs:
       # Check Env Variables
       - name: Check Env
         run: |
-          echo $CSV_URL
+          echo $DATA_PATH
       # Install mlflow
       - name: Install dependencies
         run: |
@@ -39,7 +39,7 @@ jobs:
       # Run as a mlflow project
       - name: Run mlflow project
         run: |
-          mlflow run MLproject --env-manager=local 
+          mlflow run MLProject --env-manager=local -P data_path=$DATA_PATH -P target_column=$TARGET_VAR
       
       # Get latest run_id
       - name: Get latest MLflow run_id
