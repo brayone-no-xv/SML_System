@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  DATA_PATH: "MLProject/namadataset_preprocessing/apbd_data_2026_preprocessed.csv"
+  DATA_PATH: "MLProject/apbd-dataset-2026/apbd_data_2026_preprocessed.csv"
   TARGET_VAR: "Persentase"
 
 jobs:

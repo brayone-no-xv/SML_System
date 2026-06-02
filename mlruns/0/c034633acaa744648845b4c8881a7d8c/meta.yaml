@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/0/c034633acaa744648845b4c8881a7d8c/artifacts
+end_time: 1780370458815
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: c034633acaa744648845b4c8881a7d8c
+run_name: victorious-swan-545
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780370454906
+status: 4
+tags: []
+user_id: brayone_xv

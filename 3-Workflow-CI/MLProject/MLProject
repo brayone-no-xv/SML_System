@@ -4,7 +4,7 @@ conda_env: conda.yaml
 entry_points:
   main:
     parameters:
-      data_path: {type: string, default: "namadataset_preprocessing/apbd_data_2026_preprocessed.csv"}
+      data_path: {type: string, default: "apbd-dataset-2026/apbd_data_2026_preprocessed.csv"}
       target_column: {type: string, default: "Persentase"}
       tracking_uri: {type: string, default: "file:./mlruns"}
     command: "python modelling.py --data-path {data_path} --target-column {target_column} --tracking-uri {tracking_uri}"

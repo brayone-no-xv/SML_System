@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/0/4352c8f02e63422da5464b2302c6ad81/artifacts
+end_time: 1780370128718
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 4352c8f02e63422da5464b2302c6ad81
+run_name: magnificent-worm-996
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780370125123
+status: 4
+tags: []
+user_id: brayone_xv

@@ -15,7 +15,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 RAW_DATA_PATH = PROJECT_DIR / "1-Preprocessing" / "dataset" / "apbd_data_2026.csv"
-PREPROCESSED_PATH = Path(__file__).resolve().parent / "namadataset_preprocessing" / "apbd_data_2026_preprocessed.csv"
+PREPROCESSED_PATH = Path(__file__).resolve().parent / "apbd-dataset-2026" / "apbd_data_2026_preprocessed.csv"
 TARGET_COLUMN = "Persentase"
 
 
@@ -56,7 +56,7 @@ def load_dataset():
         return dataframe, True
     if not RAW_DATA_PATH.exists():
         raise FileNotFoundError(
-            "Preprocessed dataset not found. Place it in namadataset_preprocessing/ or provide the raw dataset."
+            "Preprocessed dataset not found. Place it in apbd-dataset-2026/ or provide the raw dataset."
         )
     dataframe = pd.read_csv(RAW_DATA_PATH)
     return dataframe, False

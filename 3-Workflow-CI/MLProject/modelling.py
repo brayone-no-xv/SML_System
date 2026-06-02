@@ -15,7 +15,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 
 DEFAULT_TARGET = "Persentase"
-DEFAULT_PREPROCESSED = "namadataset_preprocessing/apbd_data_2026_preprocessed.csv"
+DEFAULT_PREPROCESSED = "apbd-dataset-2026/apbd_data_2026_preprocessed.csv"
 DEFAULT_RAW = "../1-Preprocessing/dataset/apbd_data_2026.csv"
 
 

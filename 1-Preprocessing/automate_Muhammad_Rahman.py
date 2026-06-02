@@ -20,7 +20,7 @@ def preprocess_data(
 
 
     data = pd.read_csv("1-Preprocessing/dataset/apbd_data_2026.csv")
-    preprocessed_path = Path("2-Membangun_model/namadataset_preprocessing/apbd_data_2026_preprocessed.csv")
+    preprocessed_path = Path("2-Membangun_model/apbd-dataset-2026/apbd_data_2026_preprocessed.csv")
     preprocess_data(data, "Persentase", save_preprocessed_path=str(preprocessed_path))
 
     if target_column not in dataframe.columns:
