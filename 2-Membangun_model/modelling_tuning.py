@@ -1,207 +1,219 @@
+"""
+modelling_tuning.py — Model Building & Hyperparameter Tuning
+=============================================================
+Deep learning image classification (MobileNetV2 Transfer Learning)
+untuk dataset Sampah Daur Ulang.
+
+Terintegrasi dengan pipeline preprocessing di 1-Preprocessing/automate_Muhammad_Rahman.py
+dan logging manual MLflow.
+
+Usage:
+    python modelling_tuning.py
+"""
+
+import json
+import sys
 from pathlib import Path
 
 import mlflow
-import mlflow.sklearn
-import pandas as pd
-from mlflow.models import infer_signature
-from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.impute import SimpleImputer
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import train_test_split, ParameterGrid
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+import numpy as np
+import tensorflow as tf
 
-
+# ======================== PATH SETUP ========================
 PROJECT_DIR = Path(__file__).resolve().parents[1]
-RAW_DATA_PATH = PROJECT_DIR / "1-Preprocessing" / "dataset" / "apbd_data_2026.csv"
-PREPROCESSED_PATH = Path(__file__).resolve().parent / "apbd-dataset-2026" / "apbd_data_2026_preprocessed.csv"
-TARGET_COLUMN = "Persentase"
+PREPROCESS_DIR = PROJECT_DIR / "1-Preprocessing"
+
+# Add preprocessing directory to path for import
+sys.path.insert(0, str(PREPROCESS_DIR))
+from automate_Muhammad_Rahman import preprocess, make_data_augmentation  # noqa: E402
+
+# ======================== CONFIGURATION ========================
+SEED = 42
+IMG_SIZE = (224, 224)
+CHECKPOINT_DIR = Path(__file__).resolve().parent / "checkpoints"
+CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def normalize_numeric_columns(dataframe: pd.DataFrame, columns):
-    cleaned = dataframe.copy()
-    for col in columns:
-        cleaned[col] = (
-            cleaned[col]
-            .astype(str)
-            .str.replace(",", "", regex=False)
-            .replace("nan", pd.NA)
-        )
-        cleaned[col] = pd.to_numeric(cleaned[col], errors="coerce")
-    return cleaned
+# ======================== MODEL ========================
 
+def build_model(num_classes, learning_rate=1e-3, dropout=0.3, dense_units=256):
+    """Build MobileNetV2 Sequential model with transfer learning."""
+    data_aug = make_data_augmentation()
 
-def detect_numeric_like_columns(dataframe: pd.DataFrame, threshold: float = 0.9):
-    numeric_like = []
-    for col in dataframe.columns:
-        if dataframe[col].dtype != "object":
-            continue
-        cleaned = (
-            dataframe[col]
-            .astype(str)
-            .str.replace(",", "", regex=False)
-            .replace("nan", pd.NA)
-        )
-        coerced = pd.to_numeric(cleaned, errors="coerce")
-        non_null_ratio = coerced.notna().mean()
-        if non_null_ratio >= threshold:
-            numeric_like.append(col)
-    return numeric_like
-
-
-def load_dataset():
-    if PREPROCESSED_PATH.exists():
-        dataframe = pd.read_csv(PREPROCESSED_PATH)
-        return dataframe, True
-    if not RAW_DATA_PATH.exists():
-        raise FileNotFoundError(
-            "Preprocessed dataset not found. Place it in apbd-dataset-2026/ or provide the raw dataset."
-        )
-    dataframe = pd.read_csv(RAW_DATA_PATH)
-    return dataframe, False
-
-
-def build_preprocessor(features: pd.DataFrame) -> ColumnTransformer:
-    numeric_features = features.select_dtypes(include=["int64", "float64"]).columns.tolist()
-    categorical_features = features.select_dtypes(include=["object"]).columns.tolist()
-
-    numeric_transformer = Pipeline(
-        steps=[
-            ("imputer", SimpleImputer(strategy="median")),
-            ("scaler", StandardScaler()),
-        ]
+    base_model = tf.keras.applications.MobileNetV2(
+        input_shape=IMG_SIZE + (3,),
+        include_top=False,
+        weights="imagenet",
     )
+    base_model.trainable = False
 
-    categorical_transformer = Pipeline(
-        steps=[
-            ("imputer", SimpleImputer(strategy="most_frequent")),
-            ("encoder", OneHotEncoder(handle_unknown="ignore")),
-        ]
+    model = tf.keras.Sequential([
+        tf.keras.Input(shape=IMG_SIZE + (3,)),
+        data_aug,
+        tf.keras.layers.Lambda(
+            tf.keras.applications.mobilenet_v2.preprocess_input,
+            name="preprocess_input",
+        ),
+        base_model,
+        tf.keras.layers.Conv2D(64, (3, 3), padding="same", activation="relu", name="post_conv"),
+        tf.keras.layers.MaxPooling2D(name="post_pool"),
+        tf.keras.layers.GlobalAveragePooling2D(name="post_gap"),
+        tf.keras.layers.BatchNormalization(name="post_bn1"),
+        tf.keras.layers.Dropout(dropout, name="post_dropout1"),
+        tf.keras.layers.Dense(dense_units, activation="relu", name="post_dense1"),
+        tf.keras.layers.BatchNormalization(name="post_bn2"),
+        tf.keras.layers.Dropout(dropout, name="post_dropout2"),
+        tf.keras.layers.Dense(dense_units // 2, activation="relu", name="post_dense2"),
+        tf.keras.layers.Dropout(dropout * 0.67, name="post_dropout3"),
+        tf.keras.layers.Dense(num_classes, activation="softmax", name="post_logits"),
+    ])
+
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate),
+        loss="sparse_categorical_crossentropy",
+        metrics=["accuracy"],
     )
-
-    return ColumnTransformer(
-        transformers=[
-            ("num", numeric_transformer, numeric_features),
-            ("cat", categorical_transformer, categorical_features),
-        ]
-    )
+    return model, base_model
 
 
-def evaluate_metrics(y_true, y_pred):
-    rmse = mean_squared_error(y_true, y_pred) ** 0.5
-    mae = mean_absolute_error(y_true, y_pred)
-    r2 = r2_score(y_true, y_pred)
-    return {"rmse": rmse, "mae": mae, "r2": r2}
+def evaluate_metrics(model, dataset, name="eval"):
+    """Evaluate model on a dataset and return metrics dict."""
+    loss, acc = model.evaluate(dataset, verbose=1)
+    return {f"{name}_loss": loss, f"{name}_accuracy": acc}
 
+
+# ======================== TRAINING ========================
 
 def train_with_tuning():
-    mlflow.set_tracking_uri("file:./mlruns")
-    mlflow.set_experiment("apbd-2026-tuning")
+    """Two-phase training with MLflow manual logging."""
+    mlflow.set_tracking_uri("sqlite:///mlflow.db")
+    mlflow.set_experiment("sampah-daur-ulang-tuning")
 
-    dataframe, is_preprocessed = load_dataset()
-    if TARGET_COLUMN not in dataframe.columns:
-        raise ValueError(f"Target column '{TARGET_COLUMN}' not found in dataset.")
-
-    numeric_columns = dataframe.select_dtypes(include=["int64", "float64"]).columns.tolist()
-    numeric_like_columns = detect_numeric_like_columns(dataframe)
-    for col in numeric_like_columns:
-        if col not in numeric_columns:
-            numeric_columns.append(col)
-    if TARGET_COLUMN not in numeric_columns:
-        numeric_columns.append(TARGET_COLUMN)
-    dataframe = normalize_numeric_columns(dataframe, numeric_columns)
-    dataframe = dataframe.dropna(subset=[TARGET_COLUMN])
-
-    if not is_preprocessed:
-        PREPROCESSED_PATH.parent.mkdir(parents=True, exist_ok=True)
-        dataframe.to_csv(PREPROCESSED_PATH, index=False)
-
-    X = dataframe.drop(columns=[TARGET_COLUMN])
-    y = dataframe[TARGET_COLUMN]
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.3, random_state=42
+    # Load data from preprocessing pipeline
+    dataset_dir = PREPROCESS_DIR / "sampah-daur-ulang"
+    train_ds, val_ds, test_ds, class_names, config = preprocess(
+        data_dir=dataset_dir if dataset_dir.exists() else None,
+        download_data=not dataset_dir.exists(),
     )
+    num_classes = config["NUM_CLASSES"]
 
-    param_grid = ParameterGrid(
-        {
-            "n_estimators": [150, 300],
-            "max_depth": [8, 12],
-            "min_samples_split": [2, 5],
-        }
-    )
+    # Hyperparameter grid (lightweight for local training)
+    param_configs = [
+        {"learning_rate": 1e-3, "dropout": 0.3, "dense_units": 256, "epochs_p1": 15, "epochs_p2": 20},
+        {"learning_rate": 5e-4, "dropout": 0.4, "dense_units": 128, "epochs_p1": 15, "epochs_p2": 20},
+    ]
 
-    best_run = {
-        "rmse": float("inf"),
-        "model": None,
-        "params": None,
-        "metrics": None,
-        "signature": None,
-        "input_example": None,
-    }
+    best_run = {"val_accuracy": 0.0, "params": None}
 
-    with mlflow.start_run(run_name="tuning") as parent_run:
-        mlflow.log_param("dataset_path", str(PREPROCESSED_PATH if is_preprocessed else RAW_DATA_PATH))
-        mlflow.log_param("is_preprocessed", is_preprocessed)
+    with mlflow.start_run(run_name="tuning_parent") as parent_run:
+        mlflow.log_param("architecture", "Sequential_MobileNetV2")
+        mlflow.log_param("num_classes", num_classes)
+        mlflow.log_param("class_names", str(class_names))
+        mlflow.log_param("img_size", str(IMG_SIZE))
+        mlflow.log_param("total_configs", len(param_configs))
 
-        for params in param_grid:
-            with mlflow.start_run(nested=True):
-                model = RandomForestRegressor(
-                    n_estimators=params["n_estimators"],
-                    max_depth=params["max_depth"],
-                    min_samples_split=params["min_samples_split"],
-                    random_state=42,
-                )
+        for cfg_idx, params in enumerate(param_configs):
+            print(f"\n{'='*60}")
+            print(f"CONFIG {cfg_idx+1}/{len(param_configs)}: {params}")
+            print(f"{'='*60}")
 
-                has_categorical = X_train.select_dtypes(include=["object"]).shape[1] > 0
-                if is_preprocessed and not has_categorical:
-                    model.fit(X_train, y_train)
-                    preds = model.predict(X_test)
-                    trained_model = model
-                else:
-                    preprocessor = build_preprocessor(X_train)
-                    pipeline = Pipeline(
-                        steps=[
-                            ("preprocess", preprocessor),
-                            ("model", model),
-                        ]
-                    )
-                    pipeline.fit(X_train, y_train)
-                    preds = pipeline.predict(X_test)
-                    trained_model = pipeline
-
-                metrics = evaluate_metrics(y_test, preds)
-                input_example = X_test.head(5)
-                signature = infer_signature(input_example, preds[:5])
-
+            with mlflow.start_run(nested=True, run_name=f"config_{cfg_idx+1}"):
                 mlflow.log_params(params)
-                mlflow.log_metrics(metrics)
-                mlflow.sklearn.log_model(
-                    trained_model,
-                    artifact_path="model",
-                    input_example=input_example,
-                    signature=signature,
+
+                model, base_model = build_model(
+                    num_classes,
+                    learning_rate=params["learning_rate"],
+                    dropout=params["dropout"],
+                    dense_units=params["dense_units"],
                 )
 
-                if metrics["rmse"] < best_run["rmse"]:
-                    best_run = {
-                        "rmse": metrics["rmse"],
-                        "model": trained_model,
-                        "params": params,
-                        "metrics": metrics,
-                        "signature": signature,
-                        "input_example": input_example,
-                    }
+                # Phase 1: Head training (base frozen)
+                callbacks_p1 = [
+                    tf.keras.callbacks.EarlyStopping(
+                        monitor="val_accuracy", patience=5, restore_best_weights=True
+                    ),
+                    tf.keras.callbacks.ReduceLROnPlateau(
+                        monitor="val_loss", factor=0.5, patience=3, min_lr=1e-6, verbose=1
+                    ),
+                ]
+                h1 = model.fit(
+                    train_ds, validation_data=val_ds,
+                    epochs=params["epochs_p1"], callbacks=callbacks_p1,
+                )
 
+                # Phase 2: Fine-tuning top layers
+                base_model.trainable = True
+                fine_tune_at = max(0, len(base_model.layers) - 50)
+                for layer in base_model.layers[:fine_tune_at]:
+                    layer.trainable = False
+
+                model.compile(
+                    optimizer=tf.keras.optimizers.Adam(1e-5),
+                    loss="sparse_categorical_crossentropy",
+                    metrics=["accuracy"],
+                )
+
+                callbacks_p2 = [
+                    tf.keras.callbacks.EarlyStopping(
+                        monitor="val_accuracy", patience=8, restore_best_weights=True
+                    ),
+                    tf.keras.callbacks.ReduceLROnPlateau(
+                        monitor="val_loss", factor=0.5, patience=3, min_lr=1e-7, verbose=1
+                    ),
+                    tf.keras.callbacks.ModelCheckpoint(
+                        filepath=str(CHECKPOINT_DIR / f"best_config_{cfg_idx+1}.keras"),
+                        monitor="val_accuracy", save_best_only=True, verbose=1,
+                    ),
+                ]
+                h2 = model.fit(
+                    train_ds, validation_data=val_ds,
+                    epochs=params["epochs_p2"], callbacks=callbacks_p2,
+                )
+
+                # Log metrics per epoch
+                combined = {
+                    k: h1.history[k] + h2.history[k]
+                    for k in h1.history
+                }
+                for i in range(len(combined["loss"])):
+                    mlflow.log_metric("train_loss", combined["loss"][i], step=i)
+                    mlflow.log_metric("train_accuracy", combined["accuracy"][i], step=i)
+                    mlflow.log_metric("val_loss", combined["val_loss"][i], step=i)
+                    mlflow.log_metric("val_accuracy", combined["val_accuracy"][i], step=i)
+
+                # Test evaluation
+                test_metrics = evaluate_metrics(model, test_ds, "test")
+                mlflow.log_metrics(test_metrics)
+
+                final_val_acc = max(combined["val_accuracy"])
+                mlflow.log_metric("best_val_accuracy", final_val_acc)
+
+                # Log model
+                mlflow.tensorflow.log_model(model, artifact_path="model")
+
+                # Track best
+                if final_val_acc > best_run["val_accuracy"]:
+                    best_run = {
+                        "val_accuracy": final_val_acc,
+                        "params": params,
+                        "test_metrics": test_metrics,
+                        "config_idx": cfg_idx + 1,
+                    }
+                    model.save(str(CHECKPOINT_DIR / "best_model.keras"))
+
+        # Log best run summary to parent
         mlflow.log_params({f"best_{k}": v for k, v in best_run["params"].items()})
-        mlflow.log_metrics({f"best_{k}": v for k, v in best_run["metrics"].items()})
-        mlflow.sklearn.log_model(
-            best_run["model"],
-            artifact_path="best_model",
-            input_example=best_run["input_example"],
-            signature=best_run["signature"],
-        )
+        mlflow.log_metric("best_val_accuracy", best_run["val_accuracy"])
+        for k, v in best_run["test_metrics"].items():
+            mlflow.log_metric(f"best_{k}", v)
+        mlflow.log_text(json.dumps(best_run, indent=2, default=str), "best_run_summary.json")
+
+        print(f"\n{'='*60}")
+        print(f"BEST CONFIG: #{best_run['config_idx']}")
+        print(f"  Val Accuracy : {best_run['val_accuracy']:.4f}")
+        print(f"  Test Metrics : {best_run['test_metrics']}")
+        print(f"  Params       : {best_run['params']}")
+        print(f"{'='*60}")
 
 
 if __name__ == "__main__":
