@@ -1,5 +1,34 @@
+# Lingkungan Virtual Python
+.venv/
+venv/
+env/
+
+# Cache Python & Jupyter
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Konfigurasi IDE & Sistem Operasi
+.vscode/
+.idea/
+.DS_Store
+.list
+
+# MLflow Docker & Pip Cache
 mlflow-dockerfile/wheels/
-1-Preprocessing/sampah-daur-ulang.zip
-1-Preprocessing/sampah-daur-ulang/DATASETS/
-sampah-daur-ulang.zip
+wheels/
+
+# Dataset & File Kompresi Besar
+*.zip
+*.tar.gz
+1-Preprocessing/sampah-daur-ulang/
+3-Workflow-CI/MLProject/sampah-daur-ulang/
+DATASETS/
+
+# Database Riwayat Prometheus (TSDB)
 4-Monitoring_dan_Logging/data/
+
+# CATATAN PENTING UNTUK REVIEWER:
+# Folder mlruns/ dan file mlflow.db TIDAK diabaikan di sini
+# karena wajib dikirimkan agar reviewer bisa mengetes model 
+# secara instan tanpa perlu melakukan training ulang.
