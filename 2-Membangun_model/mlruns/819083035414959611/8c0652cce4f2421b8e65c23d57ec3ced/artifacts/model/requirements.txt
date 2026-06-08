@@ -1,0 +1,6 @@
+mlflow==2.19.0
+cloudpickle==3.1.2
+numpy==1.26.4
+tensorflow==2.16.2
+gunicorn
+keras==3.3.3

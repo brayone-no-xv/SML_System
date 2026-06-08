@@ -16,6 +16,7 @@ import sys
 from pathlib import Path
 
 import mlflow
+from mlflow.models import infer_signature
 import numpy as np
 import tensorflow as tf
 
@@ -50,10 +51,7 @@ def build_model(num_classes, learning_rate=1e-3, dropout=0.3, dense_units=256):
     model = tf.keras.Sequential([
         tf.keras.Input(shape=IMG_SIZE + (3,)),
         data_aug,
-        tf.keras.layers.Lambda(
-            tf.keras.applications.mobilenet_v2.preprocess_input,
-            name="preprocess_input",
-        ),
+        tf.keras.layers.Rescaling(1./127.5, offset=-1, name="preprocess_input"),
         base_model,
         tf.keras.layers.Conv2D(64, (3, 3), padding="same", activation="relu", name="post_conv"),
         tf.keras.layers.MaxPooling2D(name="post_pool"),
@@ -86,15 +84,13 @@ def evaluate_metrics(model, dataset, name="eval"):
 
 def train_with_tuning():
     """Two-phase training with MLflow manual logging."""
-    mlflow.set_tracking_uri("sqlite:///mlflow.db")
+    # Tracking URI: simpan mlruns di folder 2-Membangun_model/ (sejajar dengan script)
+    MLRUNS_DIR = Path(__file__).resolve().parent / "mlruns"
+    mlflow.set_tracking_uri(f"file:{MLRUNS_DIR}")
     mlflow.set_experiment("sampah-daur-ulang-tuning")
 
     # Load data from preprocessing pipeline
-    dataset_dir = PREPROCESS_DIR / "sampah-daur-ulang"
-    train_ds, val_ds, test_ds, class_names, config = preprocess(
-        data_dir=dataset_dir if dataset_dir.exists() else None,
-        download_data=not dataset_dir.exists(),
-    )
+    train_ds, val_ds, test_ds, class_names, config = preprocess()
     num_classes = config["NUM_CLASSES"]
 
     # Hyperparameter grid (lightweight for local training)
@@ -188,8 +184,21 @@ def train_with_tuning():
                 final_val_acc = max(combined["val_accuracy"])
                 mlflow.log_metric("best_val_accuracy", final_val_acc)
 
-                # Log model
-                mlflow.tensorflow.log_model(model, artifact_path="model")
+                # Log model with signature and input example
+                # Ambil satu batch dari test_ds sebagai contoh input
+                for sample_batch, _ in test_ds.take(1):
+                    input_example = sample_batch[:1].numpy()
+                    break
+                predictions = model.predict(input_example)
+                signature = infer_signature(input_example, predictions)
+                mlflow.tensorflow.log_model(
+                    model,
+                    artifact_path="model",
+                    signature=signature,
+                    input_example=input_example,
+                    registered_model_name="SampahClassifier",
+                    extra_pip_requirements=["gunicorn", "keras==3.3.3"],
+                )
 
                 # Track best
                 if final_val_acc > best_run["val_accuracy"]:

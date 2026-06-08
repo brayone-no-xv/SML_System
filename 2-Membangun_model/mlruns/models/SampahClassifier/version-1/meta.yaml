@@ -1,0 +1,16 @@
+aliases: []
+creation_timestamp: 1780806030451
+current_stage: None
+description: null
+last_updated_timestamp: 1780806030451
+name: SampahClassifier
+run_id: 61c8f6778cf141dfb85d670fa03b3dad
+run_link: null
+source: file:///home/brayone-xv/Documents/My File/CODE/pijak-by-dicoding/SML_System_Muhammad
+  Rahman/2-Membangun_model/mlruns/819083035414959611/61c8f6778cf141dfb85d670fa03b3dad/artifacts/model
+status: READY
+status_message: null
+storage_location: file:///home/brayone-xv/Documents/My File/CODE/pijak-by-dicoding/SML_System_Muhammad
+  Rahman/2-Membangun_model/mlruns/819083035414959611/61c8f6778cf141dfb85d670fa03b3dad/artifacts/model
+user_id: null
+version: 1

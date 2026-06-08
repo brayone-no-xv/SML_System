@@ -40,6 +40,7 @@ TEST_SPLIT = 0.15
 IMG_EXTS = {".jpg", ".jpeg", ".png"}
 DATASET_SLUG = "fathurrahmanalfarizy/sampah-daur-ulang"
 ZIP_NAME = "sampah-daur-ulang.zip"
+PREPROCESS_DIR = Path(__file__).resolve().parent
 
 random.seed(SEED)
 np.random.seed(SEED)
@@ -72,8 +73,10 @@ def setup_kaggle():
     return True
 
 
-def download_dataset(output_dir="."):
+def download_dataset(output_dir=None):
     """Download dataset ZIP from Kaggle."""
+    if output_dir is None:
+        output_dir = PREPROCESS_DIR
     if not setup_kaggle():
         raise FileNotFoundError("kaggle.json tidak ditemukan.")
 
@@ -245,13 +248,16 @@ def preprocess(data_dir=None, download_data=True):
     config   : dict              — Konfigurasi (IMG_SIZE, BATCH_SIZE, NUM_CLASSES)
     """
     # 1. Data Loading
-    if data_dir is not None:
-        dataset_root = Path(data_dir).resolve()
-    elif download_data:
-        zip_path = download_dataset()
-        dataset_root = extract_dataset(zip_path)
-    else:
-        raise ValueError("Berikan data_dir atau set download_data=True.")
+    if data_dir is None:
+        data_dir = PREPROCESS_DIR / "sampah-daur-ulang"
+    dataset_root = Path(data_dir).resolve()
+
+    if not dataset_root.exists() or not any(dataset_root.rglob("*.jpg")):
+        if download_data:
+            zip_path = download_dataset(PREPROCESS_DIR)
+            dataset_root = extract_dataset(zip_path, dataset_root)
+        else:
+            raise ValueError(f"Dataset tidak ditemukan di {dataset_root} dan download_data=False.")
 
     # 2. Temukan class root
     class_root = find_class_root(dataset_root)

@@ -1,0 +1,17 @@
+artifact_uri: file:///home/brayone-xv/Documents/My File/CODE/pijak-by-dicoding/SML_System_Muhammad
+  Rahman/2-Membangun_model/mlruns/819083035414959611/5926f0d1748f44bba63dff094e25c556/artifacts
+deleted_time: 1780917534912
+end_time: null
+entry_point_name: ''
+experiment_id: '819083035414959611'
+lifecycle_stage: deleted
+run_id: 5926f0d1748f44bba63dff094e25c556
+run_name: tuning_parent
+run_uuid: 5926f0d1748f44bba63dff094e25c556
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780882755672
+status: 1
+tags: []
+user_id: brayone-xv

@@ -1,0 +1,15 @@
+{
+  "val_accuracy": 0.9173004031181335,
+  "params": {
+    "learning_rate": 0.001,
+    "dropout": 0.3,
+    "dense_units": 256,
+    "epochs_p1": 15,
+    "epochs_p2": 20
+  },
+  "test_metrics": {
+    "test_loss": 0.3809188902378082,
+    "test_accuracy": 0.8974359035491943
+  },
+  "config_idx": 1
+}

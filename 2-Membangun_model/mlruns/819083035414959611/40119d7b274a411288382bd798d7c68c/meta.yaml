@@ -1,0 +1,16 @@
+artifact_uri: file:///home/brayone-xv/Documents/My File/CODE/pijak-by-dicoding/SML_System_Muhammad
+  Rahman/2-Membangun_model/mlruns/819083035414959611/40119d7b274a411288382bd798d7c68c/artifacts
+end_time: 1780903492243
+entry_point_name: ''
+experiment_id: '819083035414959611'
+lifecycle_stage: active
+run_id: 40119d7b274a411288382bd798d7c68c
+run_name: fixed_deployment_model
+run_uuid: 40119d7b274a411288382bd798d7c68c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780903484390
+status: 3
+tags: []
+user_id: brayone-xv
